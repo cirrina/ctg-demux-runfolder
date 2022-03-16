@@ -36,11 +36,11 @@ nf_script="demux-main.nf"
 
 # Get current directory (MUST BE EXECUTED FROM RUN FOLDER
 exec_dir=$(pwd) ## full path where script is executed
-runfolder=${PWD##*/} ## runfolder - dirname only
+execdir_base=${PWD##*/} ##  dirname only - should match runfolder supplied in samplesheet
 
 
 ################################################
-##  == 2 ==  Read & Check input args
+##  == 2 ==  Read & Check input args (samplesheet name)
 ################################################
 sheet=$1
 if [ -z $sheet ]
@@ -49,7 +49,7 @@ then
   exit 1
 else
   samplesheet=${exec_dir}/${sheet} ## samplesheet - full path of sheet
-  basesheet=$(echo $samplesheet | sed 's/.csv//g') ## basesheet - name only
+  basesheet=$(echo $samplesheet | sed 's/.csv//g') ## basesheet - samplesheet name , no path
   if [ ! -f ${sheet} ]; then
       echo ""; echo ""; echo "Error:"
       echo "SampleSheet not found (in current dir)"
@@ -63,8 +63,8 @@ fi
 ## Check exec_dir is same as `RunFolder` in samplesheet [Header]
 ## store runFolder param
 runfolder=$(awk -F, '$1 == "RunFolder"' ${samplesheet} | awk -F, '{print $2}')
-if [[ ! ${runfolder} ==  ${samplesheet}]]; then
-  echo " Warning: 'RunFolder' is not properly supplied in samplesheet.";
+if [[ ! ${runfolder} ==  ${execdir_base}]]; then
+  echo " Warning: 'RunFolder' is not properly supplied in samplesheet [Header]";
   echo " Must be same as execution dir."; echo""; echo ""
   exit 1
 fi
@@ -73,6 +73,7 @@ fi
 pipelineName=$(awk -F, '$1 == "PipelineName"' ${samplesheet} | awk -F, '{print $2}')
 pipelineVersion=$(awk -F, '$1 == "PipelineVersion"' ${samplesheet} | awk -F, '{print $2}')
 pipelineProfile=$(awk -F, '$1 == "PipelineProfile"' ${samplesheet} | awk -F, '{print $2}') ## not implemented - could be demux with different index lengths
+bcl2fastqarg=$(awk -F, '$1 == "bcl2fastqArg"' ${samplesheet} | awk -F, '{print $2}') ## argument line for bcl2fastq
 
 # Check pipelineName (expect ctg-demux-runfolder pipeline)
 if [ ! "$pipelineName" == "ctg-demux-runfolder" ]; then
@@ -137,19 +138,20 @@ echo "//"                                        >> ${nf_config_project}
 echo ""                                          >> ${nf_config_project}
 echo " params {"                                 >> ${nf_config_project}
 echo ""                                          >> ${nf_config_project}
-echo "  // Pipeline                                       " >> ${nf_config_project}
 echo "  pipelineName       =  '${PipelineName}'       " >> ${nf_config_project}
 echo "  pipelineProfile    =  '${PipelineProfile}'                          " >> ${nf_config_project}
 echo "  pipelineVersion    =  '${PipelineVersion}'                          " >> ${nf_config_project}
 echo "  pipeline_scrips_dir  =  '${scripts_dir}'            " >> ${nf_config_project}
 echo ""                                         >> ${nf_config_project}
-echo "  runFolder          =   ${runfolder}               " >> ${nf_config_project}
-echo "  execution_dir      =  '${exec_dir}'              " >> ${nf_config_project}
-echo "  nextflow_workir    =  '${workdir_nf}'              " >> ${nf_config_project}
-echo "  output_dir         =  '${outputdir}'              " >> ${nf_config_project}
-echo "  samplesheet        =  '${samplesheet}'            " >> ${nf_config_project}
-echo "  multiqcreport      =  '${mqcreport}'              " >> ${nf_config_project}
+echo "  runFolder          =   ${runfolder}        " >> ${nf_config_project}
+echo "  runfolder_path     =  '${exec_dir}'        " >> ${nf_config_project}
+echo "  nextflow_workir    =  '${workdir_nf}'      " >> ${nf_config_project}
+echo "  output_dir         =  '${outputdir}'       " >> ${nf_config_project}
+echo "  samplesheet        =  '${samplesheet}'     " >> ${nf_config_project}
+echo "  multiqcreport      =  '${mqcreport}'       " >> ${nf_config_project}
 echo ""                                            >> ${nf_config_project}
+echo "//  process arguments"           >> ${nf_config_project}
+echo "  bcl2fastqarg      =  '${bcl2fastqarg}'     " >> ${nf_config_project}
 echo " }"                                          >> ${nf_config_project}
 echo ""                                            >> ${nf_config_project}
 
@@ -166,10 +168,11 @@ echo " ... pipelineVersion   : ${pipelineVersion}";
 echo " ... pipelineProfile   : ${pipelineProfile}";
 echo " ... runFolder         : ${runfolder}";
 echo " ... nextflow_workir   : ${workdir_nf}";
-echo " ... fasftq output     : ${outputdir}";
+echo " ... fastq output      : ${outputdir}";
 echo ""; echo "";
 
 ## intiate the nextflow command. include project specific config & profile -p
+cd ${workdir_nf}
 nohup nextflow run ${nf_script} -c ${nf_config_project} > log.nextflow.progress &
 
 echo ""
