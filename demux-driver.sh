@@ -81,6 +81,7 @@ if [ ! "$pipelineName" == "ctg-demux-runfolder" ]; then
   echo " Warning: 'PiepelineName' not set. Expecting 'ctg-demux-runfolder' " ;
   echo ""
   exit 1
+fi
 
 # Generate pipeline path (scritps_root + pipelineName + pipelineVersion)
 # copy scripts to local workdir within demux output folder (below)
@@ -112,12 +113,14 @@ if [[  -d ${outputdir} ]] ; then
   echo "outputdir already exist: ${outputdir} "; echo ""
   exit 1
 fi
-mkdir -p ${outputdir}
 
+mkdir -p ${outputdir}
+mkdir -p ${workdir_nf}
+
+cd ${workdir_nf}
 cp -r ${scripts_dir}/* ${workdir_nf} # copy all scripts to workfolder. Will overwrite netflow.config
 chmod -R 775 ${workdir_nf}
 cp ${samplesheet} ${workdir_nf} # Copy samplesheet to project workfolder
-cd ${workdir_nf}
 
 
 
@@ -125,7 +128,7 @@ cd ${workdir_nf}
 ##  == 5 ==  Generate NextFlow Config
 ################################################
 ## - nextflow.config.params.${runfolder}
-nf_config_project="${workdir_nf}/nextflow.config.params.${runfolder}"
+nf_config_project=${workdir_nf}/nextflow.config.params.${runfolder}
 
 echo ""
 echo " ... Writing nextflow parameters to project-specific config: ${nf_config_project}"
