@@ -38,6 +38,9 @@ nf_script="demux-main.nf"
 exec_dir=$(pwd) ## full path where script is executed
 execdir_base=${PWD##*/} ##  dirname only - should match runfolder supplied in samplesheet
 
+script_exec_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # Where is this script located...
+script_exec_dir=$(cd ${script_exec_dir} && pwd -P) # needed in case script exec dir is a symlink
+
 
 ################################################
 ##  == 2 ==  Read & Check input args (samplesheet name)
@@ -63,36 +66,36 @@ fi
 ## Check exec_dir is same as `RunFolder` in samplesheet [Header]
 ## store runFolder param
 runfolder=$(awk -F, '$1 == "RunFolder"' ${samplesheet} | awk -F, '{print $2}')
-if [[ ! ${runfolder} ==  ${execdir_base}]]; then
+if [[ ! ${runfolder} ==  ${execdir_base} ]]; then
   echo " Warning: 'RunFolder' is not properly supplied in samplesheet [Header]";
   echo " Must be same as execution dir."; echo""; echo ""
   exit 1
 fi
 
-## Read PipelineName, PipelineProfile and PipelineVersion
-pipelineName=$(awk -F, '$1 == "PipelineName"' ${samplesheet} | awk -F, '{print $2}')
-pipelineVersion=$(awk -F, '$1 == "PipelineVersion"' ${samplesheet} | awk -F, '{print $2}')
-pipelineProfile=$(awk -F, '$1 == "PipelineProfile"' ${samplesheet} | awk -F, '{print $2}') ## not implemented - could be demux with different index lengths
-bcl2fastqarg=$(awk -F, '$1 == "bcl2fastqArg"' ${samplesheet} | awk -F, '{print $2}') ## argument line for bcl2fastq
-
-# Check pipelineName (expect ctg-demux-runfolder pipeline)
-if [ ! "$pipelineName" == "ctg-demux-runfolder" ]; then
-  echo ""; echo "";
-  echo " Warning: 'PiepelineName' not set. Expecting 'ctg-demux-runfolder' " ;
-  echo ""
-  exit 1
-fi
-
-# Generate pipeline path (scritps_root + pipelineName + pipelineVersion)
-# copy scripts to local workdir within demux output folder (below)
-scripts_dir="${scripts_root}/${pipelineName}/${pipelineVersion}"
-
-if [[ ! -d ${scripts_dir} ]]; then
-  echo ""; echo "";
-  echo " Warning: scripts_dir does not exist: ${scripts_dir} "; echo ""
-  echo " Make sure PipelineName and PipelineVersion are correctly supplied in SampleSheet"; echo " AND that they match a directory whtin the scripts_root folder: ${scripts_root}."
-  exit 1
-fi
+# ## Read PipelineName, PipelineProfile and PipelineVersion
+# pipelineName=$(awk -F, '$1 == "PipelineName"' ${samplesheet} | awk -F, '{print $2}')
+# pipelineVersion=$(awk -F, '$1 == "PipelineVersion"' ${samplesheet} | awk -F, '{print $2}')
+# pipelineProfile=$(awk -F, '$1 == "PipelineProfile"' ${samplesheet} | awk -F, '{print $2}') ## not implemented - could be demux with different index lengths
+# bcl2fastqarg=$(awk -F, '$1 == "bcl2fastqArg"' ${samplesheet} | awk -F, '{print $2}') ## argument line for bcl2fastq
+#
+# # Check pipelineName (expect ctg-demux-runfolder pipeline)
+# if [ ! "$pipelineName" == "ctg-demux-runfolder" ]; then
+#   echo ""; echo "";
+#   echo " Warning: 'PiepelineName' not set. Expecting 'ctg-demux-runfolder' " ;
+#   echo ""
+#   exit 1
+# fi
+#
+# # Generate pipeline path (scritps_root + pipelineName + pipelineVersion)
+# # copy scripts to local workdir within demux output folder (below)
+# scripts_dir="${scripts_root}/${pipelineName}/${pipelineVersion}"
+#
+# if [[ ! -d ${scripts_dir} ]]; then
+#   echo ""; echo "";
+#   echo " Warning: scripts_dir does not exist: ${scripts_dir} "; echo ""
+#   echo " Make sure PipelineName and PipelineVersion are correctly supplied in SampleSheet"; echo " AND that they match a directory whtin the scripts_root folder: ${scripts_root}."
+#   exit 1
+# fi
 
 
 ################################################
@@ -118,7 +121,7 @@ mkdir -p ${outputdir}
 mkdir -p ${workdir_nf}
 
 cd ${workdir_nf}
-cp -r ${scripts_dir}/* ${workdir_nf} # copy all scripts to workfolder. Will overwrite netflow.config
+cp -r ${script_exec_dir}/* ${workdir_nf} # copy all scripts to workfolder. Will overwrite netflow.config
 chmod -R 775 ${workdir_nf}
 cp ${samplesheet} ${workdir_nf} # Copy samplesheet to project workfolder
 
@@ -142,9 +145,9 @@ echo ""                                          >> ${nf_config_project}
 echo " params {"                                 >> ${nf_config_project}
 echo ""                                          >> ${nf_config_project}
 echo "  pipelineName       =  '${PipelineName}'       " >> ${nf_config_project}
-echo "  pipelineProfile    =  '${PipelineProfile}'                          " >> ${nf_config_project}
-echo "  pipelineVersion    =  '${PipelineVersion}'                          " >> ${nf_config_project}
-echo "  pipeline_scrips_dir  =  '${scripts_dir}'            " >> ${nf_config_project}
+echo "  pipelineProfile    =  '${PipelineProfile}'          " >> ${nf_config_project}
+echo "  pipelineVersion    =  '${PipelineVersion}'          " >> ${nf_config_project}
+echo "  pipeline_scrips_dir  =  '${script_exec_dir}'        " >> ${nf_config_project}
 echo ""                                         >> ${nf_config_project}
 echo "  runFolder          =   ${runfolder}        " >> ${nf_config_project}
 echo "  runfolder_path     =  '${exec_dir}'        " >> ${nf_config_project}
