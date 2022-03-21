@@ -13,6 +13,7 @@ samplesheet         =  params.samplesheet           // name of simple sample she
 output_dir          =  params.output_dir
 multiqcreport       =  params.multiqcreport
 
+ctg_qc_dir          = "/projects/fs1/shared/ctg-qc/interop/"
 
 /* ===============================================================
   *       create output and logdirs
@@ -166,7 +167,10 @@ process finalize_pipeline {
     ## Write cronlog
     touch ${runfolder_path}/ctg.demux.${runfolder}.done ## NOTE! change if allow multiple demux in one runfolder
     cronlog_all="/projects/fs1/shared/ctg-cron/ctg-cron.log"
-    echo "\$(date): ${runfolder}: DONE:  (${runfolder})" >> \$cronlog
+    cronlog="/projects/fs1/shared/ctg-cron/ctg-pipe-cron/logs/demux/demux.${runfolder}.${samplesheet}.log"
+    echo "\$(date): ${runfolder}: DONE: demux (${runfolder})" >> \${cronlog_all}
+    echo "\$(date): ${runfolder}: DONE: demux (${runfolder})" >> \${cronlog}
+
 
     ## Chmod all dirs
     find ${output_dir} -user $USER -exec chmod g+rw {} +

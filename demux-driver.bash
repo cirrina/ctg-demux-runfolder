@@ -181,7 +181,7 @@ cd ${workdir_nf}
 module load Java
 module load nextflow/19.04.1
 module load Singularity
-nextflow run ${nf_script} -c ${nf_config_project} > log.nextflow.progress &
+nextflow run ${nf_script} -c ${nf_config_project} > log.nextflow.progress
 
 echo ""
 echo "  Running :   nextflow run ${nf_script} -c ${nf_config_project}"
