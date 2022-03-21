@@ -164,7 +164,7 @@ process finalize_pipeline {
     """
 
     ## Write cronlog
-    touch ${runfolder_path}/ctg-demux-runfolder.${runfolder}.done ## NOTE! change if allow multiple demux in one runfolder
+    touch ${runfolder_path}/ctg.demux.${runfolder}.done ## NOTE! change if allow multiple demux in one runfolder
     cronlog_all="/projects/fs1/shared/ctg-cron/ctg-cron.log"
     echo "\$(date): ${runfolder}: DONE:  (${runfolder})" >> \$cronlog
 

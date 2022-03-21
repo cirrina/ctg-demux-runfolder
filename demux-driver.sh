@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -l
 
 ################################################
 ##  == ** ==  ctg-demux-runfolder  == ** ==
@@ -179,6 +179,9 @@ echo ""; echo "";
 
 ## intiate the nextflow command. include project specific config & profile -p
 cd ${workdir_nf}
+module load Java
+module load nextflow/19.04.1
+module load Singularity
 nohup nextflow run ${nf_script} -c ${nf_config_project} > log.nextflow.progress &
 
 echo ""
