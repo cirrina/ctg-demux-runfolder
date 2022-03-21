@@ -154,7 +154,7 @@ echo "  runfolder_path     =  '${exec_dir}'        " >> ${nf_config_project}
 echo "  nextflow_workir    =  '${workdir_nf}'      " >> ${nf_config_project}
 echo "  output_dir         =  '${outputdir}'       " >> ${nf_config_project}
 echo "  samplesheet        =  '${samplesheet}'     " >> ${nf_config_project}
-echo "  multiqcreport      =  '${mqcreport}'       " >> ${nf_config_project}
+echo "  multiqcreport      =  '${multiqcreport}'       " >> ${nf_config_project}
 echo ""                                            >> ${nf_config_project}
 echo "//  process arguments"           >> ${nf_config_project}
 echo "  bcl2fastqarg      =  '${bcl2fastqarg}'     " >> ${nf_config_project}
