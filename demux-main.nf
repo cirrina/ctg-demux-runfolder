@@ -88,8 +88,8 @@ workflow.onComplete {
 
 // bcl2fastq
 process bcl2fastq {
-    tag "$projid"
-    cpus cpu_standard
+    tag "${runfolder}"
+    cpus params.cpu_standard
     memory params.mem_high
 
     input:
@@ -118,7 +118,7 @@ process bcl2fastq {
 
 
 process multiqc {
-  tag "$projid"
+  tag "${runfolder}"
   cpus params.cpu_standard
   memory params.mem_standard
 

@@ -35,10 +35,10 @@ output_root='/projects/fs1/shared/demux-runfolder'
 nf_script="demux-main.nf"
 
 # Get current directory (MUST BE EXECUTED FROM RUN FOLDER
-exec_dir=$(pwd) ## full path where script is executed
+exec_dir=$(pwd) ## full path where script is initiated (not same as where scripts are located)
 execdir_base=${PWD##*/} ##  dirname only - should match runfolder supplied in samplesheet
 
-script_exec_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # Where is this script located...
+script_exec_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # Where is this script located.... may be a symlink 'current'
 script_exec_dir=$(cd ${script_exec_dir} && pwd -P) # needed in case script exec dir is a symlink
 
 
@@ -165,8 +165,6 @@ echo ""                                            >> ${nf_config_project}
 ################################################
 ##  == 6 ==  Execute the main NextFlow script
 ################################################
-cd ${project_dir}
-
 echo ""; echo "";
 echo " Initiating nextflow pipeline"
 echo " ... pipelineName      : ${pipelineName}";
@@ -177,12 +175,13 @@ echo " ... nextflow_workir   : ${workdir_nf}";
 echo " ... fastq output      : ${outputdir}";
 echo ""; echo "";
 
+
 ## intiate the nextflow command. include project specific config & profile -p
 cd ${workdir_nf}
 module load Java
 module load nextflow/19.04.1
 module load Singularity
-nohup nextflow run ${nf_script} -c ${nf_config_project} > log.nextflow.progress &
+nextflow run ${nf_script} -c ${nf_config_project} > log.nextflow.progress &
 
 echo ""
 echo "  Running :   nextflow run ${nf_script} -c ${nf_config_project}"
