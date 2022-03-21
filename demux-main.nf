@@ -59,9 +59,11 @@ def msg_startup = """\
 
 println( msg_startup )
 
+
 workflow.onComplete {
+
   def msg_completed = """\
-    Pipeline execution summary
+  	Pipeline execution summary
   	---------------------------
   	Completed at : ${workflow.complete}
   	Duration     : ${workflow.duration}
@@ -72,24 +74,23 @@ workflow.onComplete {
   	errorReport  :
   	"""
   	.stripIndent()
-
-    def error = """\
-		  ${workflow.errorReport}
-	     """
-
-     logfile.text = msg_startup.stripIndent()
-     logfile.append( msg_completed.stripIndent()
-     logfile.append( error )
+  def error = """\
+		${workflow.errorReport}
+	   """
+  logfile.text = msg_startup.stripIndent()
+  logfile.append( msg_completed.stripIndent() )
+  logfile.append( error )
 
   println( msg_completed )
 }
 
 
+
 // bcl2fastq
 process bcl2fastq {
     tag "$projid"
-    cpus params.cpu_standard
-    memory params.mem_standard
+    cpus cpu_standard
+    memory params.mem_high
 
     input:
     val "start"
@@ -100,7 +101,7 @@ process bcl2fastq {
     script:
     if ( params.run_bcl2fastq )
       """
-      bcl2fastq -R ${runfolder} \\
+      bcl2fastq -R ${runfolder_path} \\
                 --sample-sheet ${samplesheet} \\
                 --no-lane-splitting  \\
                 -r 1 \\
@@ -148,7 +149,7 @@ process multiqc {
 
 process finalize_pipeline {
 
-  tag  { params.run_finalize_pipeline  ? "${projectid}" : "blank_run"  }
+  tag  { params.run_finalize_pipeline  ? "${runfolder}" : "blank_run"  }
   memory params.mem_min
   cpus params.cpu_min
 
@@ -165,7 +166,7 @@ process finalize_pipeline {
     ## Write cronlog
     touch ${runfolder_path}/ctg-demux-runfolder.${runfolder}.done ## NOTE! change if allow multiple demux in one runfolder
     cronlog_all="/projects/fs1/shared/ctg-cron/ctg-cron.log"
-    echo "\$(date): ${runfolder}: DONE:  (${projectid})" >> \$cronlog
+    echo "\$(date): ${runfolder}: DONE:  (${runfolder})" >> \$cronlog
 
     ## Chmod all dirs
     find ${delivery_dir} -user $USER -exec chmod g+rw {} +

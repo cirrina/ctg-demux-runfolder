@@ -149,7 +149,7 @@ echo "  pipelineProfile    =  '${PipelineProfile}'          " >> ${nf_config_pro
 echo "  pipelineVersion    =  '${PipelineVersion}'          " >> ${nf_config_project}
 echo "  pipeline_scrips_dir  =  '${script_exec_dir}'        " >> ${nf_config_project}
 echo ""                                         >> ${nf_config_project}
-echo "  runFolder          =   ${runfolder}        " >> ${nf_config_project}
+echo "  runFolder          =  '${runfolder}'        " >> ${nf_config_project}
 echo "  runfolder_path     =  '${exec_dir}'        " >> ${nf_config_project}
 echo "  nextflow_workir    =  '${workdir_nf}'      " >> ${nf_config_project}
 echo "  output_dir         =  '${outputdir}'       " >> ${nf_config_project}
