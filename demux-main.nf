@@ -169,8 +169,7 @@ process finalize_pipeline {
     echo "\$(date): ${runfolder}: DONE:  (${runfolder})" >> \$cronlog
 
     ## Chmod all dirs
-    find ${delivery_dir} -user $USER -exec chmod g+rw {} +
-    find ${project_dir} -user $USER -exec chmod g+rw {} +
+    find ${output_dir} -user $USER -exec chmod g+rw {} +
     find ${ctg_qc_dir} -user $USER -exec chmod g+rw {} +
     """
   else
