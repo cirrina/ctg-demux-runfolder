@@ -90,7 +90,7 @@ workflow.onComplete {
 // bcl2fastq
 process bcl2fastq {
     tag "${runfolder}"
-    cpus params.cpu_standard
+    cpus params.cpu_high
     memory params.mem_high
 
     input:
