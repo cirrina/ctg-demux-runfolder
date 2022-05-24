@@ -76,7 +76,7 @@ fi
 # pipelineName=$(awk -F, '$1 == "PipelineName"' ${samplesheet} | awk -F, '{print $2}')
 # pipelineVersion=$(awk -F, '$1 == "PipelineVersion"' ${samplesheet} | awk -F, '{print $2}')
 # pipelineProfile=$(awk -F, '$1 == "PipelineProfile"' ${samplesheet} | awk -F, '{print $2}') ## not implemented - could be demux with different index lengths
-# bcl2fastqarg=$(awk -F, '$1 == "bcl2fastqArg"' ${samplesheet} | awk -F, '{print $2}') ## argument line for bcl2fastq
+bcl2fastqarg=$(awk -F, '$1 == "bcl2fastqArg"' ${samplesheet} | awk -F, '{print $2}') ## argument line for bcl2fastq
 #
 # # Check pipelineName (expect ctg-demux-runfolder pipeline)
 # if [ ! "$pipelineName" == "ctg-demux-runfolder" ]; then

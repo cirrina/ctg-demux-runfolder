@@ -103,17 +103,16 @@ process bcl2fastq {
     if ( params.run_bcl2fastq )
       """
       bcl2fastq -R ${runfolder_path} \\
-                --sample-sheet ${samplesheet} \\
-                --no-lane-splitting  \\
+                --sample-sheet ${samplesheet} ${params.bcl2fastqarg} \\
                 -r 1 \\
                 -p $task.cpus  \\
                 -w 1  \\
-                --output-dir ${output_dir} \\
-  	            ${params.bcl2fastqarg}
+                --output-dir ${output_dir}
+  	            
        """
     else
        """
-       echo "run_multiqc skipped"
+       echo "bcl2fastq skipped"
        """
 }
 
