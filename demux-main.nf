@@ -13,11 +13,11 @@ samplesheet         =  params.samplesheet           // name of simple sample she
 output_dir          =  params.output_dir
 // multiqcreport       =  params.multiqcreport
 ctg_qc_root         = params.ctg_qc_root
-multiqcdir       =  params.multiqcdir
+multiqcdir          =  params.multiqcdir
 fastqcdir           =  params.fastqcdir
 fastqscreendir      =  params.fastqscreendir
 
-ctg_qc_dir          = "/projects/fs1/shared/ctg-qc/interop/"
+ctg_qc_dir          = "/projects/fs1/shared/ctg-qc/interop/" // copy multiqc to the ctg interop (replace if already present). This to sync demux-interop per runfolder to the ctg qc app
 
 /* ===============================================================
   *       create output and logdirs
@@ -322,6 +322,7 @@ process multiqc {
 
 // finalize
 // add to cronlog
+// add samplesheet to separate dir
 process finalize_pipeline {
 
   tag  { params.run_finalize_pipeline  ? "${runfolder}" : "blank_run"  }
@@ -337,6 +338,10 @@ process finalize_pipeline {
   script:
   if (params.run_finalize_pipeline)
     """
+    ## cp samplesheet from nextflow rundir to output dir (demux dir)
+    cd ${output_dir}
+    mkdir -p samplesheets
+    cp ${samplesheet} ./samplesheets/ 
 
     ## Write cronlog
     touch ${runfolder_path}/ctg.demux.${runfolder}.done ## NOTE! change if allow multiple demux in one runfolder
