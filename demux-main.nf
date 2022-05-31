@@ -280,7 +280,9 @@ process fastqscreen {
       """
 }
 
-
+/* ===============================================================
+  *      multiqc 
+  =============================================================== */
 
 // multiqc -- CTG specific multiqc (for entire runfolder)
 // Note that multiqc is also copied to the CTG interop folder (multiqcreport=${ctg_qc_root}/multiqc_ctg_interop_${runfolder}) that is synced to QC app

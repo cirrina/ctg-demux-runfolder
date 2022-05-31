@@ -25,6 +25,31 @@
 
 ## this sctipt is a continuation of the ctg-demux2 batch script but with nextflow functionality
 
+
+################################################
+##  == 0 ==  Input args n opts
+################################################
+cronjob='false'
+
+while getopts s:ch opt; do
+    case $opt in
+        s) sheet=$OPTARG
+	          ;;
+        c) cronjob='true' ## use -c argument if initiated using cron. This to skip interactive user input.
+            ;;
+        h) exit_abnormal
+            ;;
+        \?) echo "> Error: Invalid option -$OPTARG" >&2
+            exit_abnormal ;;
+        :) echo "> Error: -${OPTARG} requires an argument!"
+            exit_abnormal ;;
+
+    esac
+done
+
+shift "$(( OPTIND -1 ))"
+
+
 ################################################
 ##  == 1 ==  Define Params
 ################################################
@@ -45,8 +70,8 @@ script_exec_dir=$(cd ${script_exec_dir} && pwd -P) # needed in case script exec 
 ################################################
 ##  == 2 ==  Read & Check input args (samplesheet name)
 ################################################
-sheet=$1
-if [ -z $sheet ]
+# sheet=$1
+if [ -z ${sheet} ]
 then
   echo "> WARNING: No samplesheet specified"
   exit 1
