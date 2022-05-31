@@ -103,7 +103,11 @@ bcl2fastqarg=$(awk -F, '$1 == "bcl2fastqArg"' ${samplesheet} | awk -F, '{print $
 ################################################
 outputdir=${output_root}/${runfolder} ## the outputdir is the base for script/demux output. will be used as -o in bcl2fastq
 workdir_nf=${outputdir}/nextflow-workdir
-multiqcreport=${ctg_qc_root}/multiqc_ctg_interop_${runfolder}
+# multiqcreport_ctg_interop=${ctg_qc_root}/multiqc_ctg_interop_${runfolder}
+multiqcdir=${outputdir}/multiqc
+# multiqcreport=${multiqcdir}/multiqc_${runfolder}
+fastqcdir=${outputdir}/fastqc
+fastqscreendir=${outputdir}/fastqscreen
 
 ## nextflow workfiles (nf-workdir), containing pipeline scripts are copied to this folder
 ## The multiqc is set to replace existing multiqc files (generated in ctg-qc/interop by the ctg-interop cron)
@@ -144,19 +148,21 @@ echo "//"                                        >> ${nf_config_project}
 echo ""                                          >> ${nf_config_project}
 echo " params {"                                 >> ${nf_config_project}
 echo ""                                          >> ${nf_config_project}
-echo "  pipelineName       =  '${PipelineName}'       " >> ${nf_config_project}
-echo "  pipelineProfile    =  '${PipelineProfile}'          " >> ${nf_config_project}
-echo "  pipelineVersion    =  '${PipelineVersion}'          " >> ${nf_config_project}
+echo "  pipelineName         =  '${PipelineName}'       " >> ${nf_config_project}
+echo "  pipelineProfile      =  '${PipelineProfile}'          " >> ${nf_config_project}
 echo "  pipeline_scrips_dir  =  '${script_exec_dir}'        " >> ${nf_config_project}
-echo ""                                         >> ${nf_config_project}
-echo "  runFolder          =  '${runfolder}'        " >> ${nf_config_project}
+echo ""                                              >> ${nf_config_project}
+echo "  runFolder          =  '${runfolder}'       " >> ${nf_config_project}
 echo "  runfolder_path     =  '${exec_dir}'        " >> ${nf_config_project}
 echo "  nextflow_workir    =  '${workdir_nf}'      " >> ${nf_config_project}
 echo "  output_dir         =  '${outputdir}'       " >> ${nf_config_project}
+echo "  ctg_qc_root         =  '${ctg_qc_root}'       " >> ${nf_config_project}
 echo "  samplesheet        =  '${samplesheet}'     " >> ${nf_config_project}
-echo "  multiqcreport      =  '${multiqcreport}'       " >> ${nf_config_project}
+echo "  multiqcdir         =  '${multiqcdir}'   " >> ${nf_config_project}
+echo "  fastqcdir          =  '${fastqcdir}'       " >> ${nf_config_project}
+echo "  fastqscreendir     =  '${fastqscreendir}'  " >> ${nf_config_project}
 echo ""                                            >> ${nf_config_project}
-echo "//  process arguments"           >> ${nf_config_project}
+echo "//  process arguments"                       >> ${nf_config_project}
 echo "  bcl2fastqarg      =  '${bcl2fastqarg}'     " >> ${nf_config_project}
 echo " }"                                          >> ${nf_config_project}
 echo ""                                            >> ${nf_config_project}
