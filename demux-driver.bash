@@ -68,7 +68,7 @@ script_exec_dir=$(cd ${script_exec_dir} && pwd -P) # needed in case script exec 
 
 
 ################################################
-##  == 2 ==  Read & Check input args (samplesheet name)
+##  == 2 ==  Check input args (samplesheet name)
 ################################################
 # sheet=$1
 if [ -z ${sheet} ]

@@ -223,6 +223,8 @@ process fastqc {
   if ( params.paired_global && params.run_fastqc)
     """
     mkdir -p ${fastqcdir}
+    mkdir -p ${fastqcdir}/${pid}
+
     echo "running fastqc in paired reads mode"
     fastqc ${output_dir}/${pid}/${read1} ${output_dir}/${pid}/${read2}  --outdir ${fastqcdir}
     """
@@ -230,7 +232,7 @@ process fastqc {
     """
     mkdir -p ${fastqcdir}
     echo "running fastqc in non paired reads mode "
-    fastqc ${output_dir}/${pid}/${read1}  --outdir ${fastqcdir}
+    fastqc ${output_dir}/${pid}/${read1}  --outdir ${fastqcdir}/${pid}
     """
   else
     """
@@ -268,10 +270,12 @@ process fastqscreen {
     if ( params.run_fastqscreen)
       """
       mkdir -p ${fastqscreendir}
+      mkdir -p ${fastqscreendir}/${pid}
+
       fastq_screen \\
           --conf ${params.fastqscreen_config} \\
           --subset 500000 \\
-          --outdir ${fastqscreendir} \\
+          --outdir ${fastqscreendir}/${pid} \\
           ${fqsfiles}
       """
     else
