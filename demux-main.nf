@@ -98,7 +98,7 @@ workflow.onComplete {
 sheet = file(params.samplesheet)
 all_lines = sheet.readLines()
 write_row = false // if next lines has sample info
-sheet_nf = file("${project_dir}/SampleSheet-nexflow.csv")
+sheet_nf = file("${workdir_nf}/SampleSheet-nexflow.csv")
 sheet_nf.text=""
 
 for ( line in all_lines ) {
