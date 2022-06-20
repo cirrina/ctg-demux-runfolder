@@ -118,7 +118,7 @@ Channel
   .set { fastq_ch }
 
 println " > Samples to process: "
-println "[Sample_ID,fastq1,fastq2]"
+println "[Sample_ID,ProjectID,fastq1,fastq2]"
 infoall.subscribe { println "Info: $it" }
 
 
@@ -135,7 +135,7 @@ process bcl2fastq {
     val "start"
 
     output:
-    val "x" into bcl2fastq_complete
+    val "x" into bcl2fastq_complete_ch
 
     script:
     if ( params.run_bcl2fastq )
@@ -166,7 +166,8 @@ process checkfiles_fastq {
   memory params.mem_min
 
   input:
-  set sid, pid, read1, read2, from fastq_ch
+  val x from bcl2fastq_complete_ch.collect()
+  set sid, pid, read1, read2 from fastq_ch
 
   output:
   val "x" into checkfiles_fastq_complete_ch

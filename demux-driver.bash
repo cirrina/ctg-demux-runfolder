@@ -77,7 +77,8 @@ then
   exit 1
 else
   samplesheet=${exec_dir}/${sheet} ## samplesheet - full path of sheet
-  basesheet=$(echo $samplesheet | sed 's/.csv//g') ## basesheet - samplesheet name , no path
+  # basesheet=$(echo $samplesheet | sed 's/.csv//g') ## basesheet - samplesheet name , no path
+  basesheet="$(basename ${sheet})"
   if [ ! -f ${sheet} ]; then
       echo ""; echo ""; echo "Error:"
       echo "SampleSheet not found (in current dir)"
@@ -181,8 +182,8 @@ echo "  runFolder          =  '${runfolder}'       " >> ${nf_config_project}
 echo "  runfolder_path     =  '${exec_dir}'        " >> ${nf_config_project}
 echo "  nextflow_workir    =  '${workdir_nf}'      " >> ${nf_config_project}
 echo "  output_dir         =  '${outputdir}'       " >> ${nf_config_project}
-echo "  ctg_qc_root         =  '${ctg_qc_root}'       " >> ${nf_config_project}
-echo "  samplesheet        =  '${samplesheet}'     " >> ${nf_config_project}
+echo "  ctg_qc_root        =  '${ctg_qc_root}'       " >> ${nf_config_project}
+echo "  samplesheet        =  '${workdir_nf}/${basesheet}'     " >> ${nf_config_project}
 echo "  multiqcdir         =  '${multiqcdir}'   " >> ${nf_config_project}
 echo "  fastqcdir          =  '${fastqcdir}'       " >> ${nf_config_project}
 echo "  fastqscreendir     =  '${fastqscreendir}'  " >> ${nf_config_project}
