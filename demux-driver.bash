@@ -26,6 +26,7 @@
 ## this sctipt is a continuation of the ctg-demux2 batch script but with nextflow functionality
 
 
+
 ################################################
 ##  == 0 ==  Input args n opts
 ################################################

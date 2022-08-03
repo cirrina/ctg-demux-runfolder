@@ -153,6 +153,45 @@ process bcl2fastq {
        """
 }
 
+/* ===============================================================
+  *      ** multiqc ** demux only ** 
+  =============================================================== */
+// This multiQC is run prior fastq cheks, fastqc and fastqscreen.
+// Run this so that a multiQC is run even though subsequent steps fail. A MultiQC including the demux should still be available on app for trouble shooting.
+// Note that multiqc is also copied to the CTG interop folder (multiqcreport=${ctg_qc_root}/multiqc_ctg_interop_${runfolder}) that is synced to QC app
+process multiqc_demux {
+  tag "${runfolder}"
+  cpus params.cpu_standard
+  memory params.mem_standard
+
+  input:
+  val x from bcl2fastq_complete_ch.collect()
+
+  output:
+  val "x" into multiqc_demux_complete_ch
+
+  script:
+  if ( params.run_multiqc_demux )
+    """
+    ## use -f flag to overwrite if multiqc is already present from failed run.
+    ## run multiqc on both runfolder (runfolder_path) and bcl2fastq demux outputdir (output_dir)
+    
+    cd ${output_dir}
+    mkdir -p ${multiqcdir}
+    multiqc -n ${multiqcdir}_${runfolder} \\
+      --interactive \\
+      -f ${runfolder_path} ${output_dir}
+
+    cp -r ${multiqcdir}/multiqc_${runfolder}_data ${ctg_qc_root}/multiqc_ctg_interop_${runfolder}_data
+    cp ${multiqcdir}/multiqc_${runfolder}.html ${ctg_qc_root}/multiqc_ctg_interop_${runfolder}.html
+
+    """
+  else
+    """
+    echo "run_multiqc skipped"
+    """
+}
+
 
 /* ===============================================================
   *    --- CHECK FASTQ FILES ---
@@ -166,7 +205,7 @@ process checkfiles_fastq {
   memory params.mem_min
 
   input:
-  val x from bcl2fastq_complete_ch.collect()
+  val x from multiqc_demux_complete_ch.collect()
   set sid, pid, read1, read2 from fastq_ch
 
   output:
@@ -286,9 +325,9 @@ process fastqscreen {
 }
 
 /* ===============================================================
-  *      multiqc 
+  *      ** multiqc ** 2nd round ** 
   =============================================================== */
-
+// This multiQC includes fastqc and fastqscreen.
 // multiqc -- CTG specific multiqc (for entire runfolder)
 // Note that multiqc is also copied to the CTG interop folder (multiqcreport=${ctg_qc_root}/multiqc_ctg_interop_${runfolder}) that is synced to QC app
 process multiqc {
@@ -325,9 +364,11 @@ process multiqc {
     """
 }
 
+/* ===============================================================
+  *      finalize 
+  =============================================================== */
 
-
-// finalize
+// 
 // add to cronlog
 // add samplesheet to separate dir
 process finalize_pipeline {
